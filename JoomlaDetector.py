@@ -11,19 +11,20 @@ def JoomlaDetector(webpage, action):
     if action == "detect":
         try:
             req = requests.get(joomlaxml)
-            if req:
+            if req.status_code == 200:
                 return True
             else:
                 webhtml = JoomlaDetector(webpage, "html")
                 soup = BeautifulSoup(webhtml, features="lxml")
                 joomlameta = soup.find("meta", attrs={"name": "generator"})
-
-                if "Joomla" in joomlameta["content"]:
-                    return "no_info"
+                if joomlameta:
+                    if "Joomla" in joomlameta["content"]:
+                        return "no_info"
+                    else:
+                        return False
                 else:
                     return False
         except requests.exceptions.RequestException as e:
-            print(e)
             return "exc"
     elif action == "getinfo":
         req = requests.get(joomlaxml).text
@@ -40,15 +41,15 @@ def JoomlaDetector(webpage, action):
 
 
 def main():
-    webpage = sys.argv[1]
-    if not webpage:
+    if len(sys.argv) == 1:
         print(f"{Fore.RED}[!] Set a URL!{Fore.RESET}")
     else:
+        webpage = sys.argv[1]
         if not webpage.startswith("http"):
             print(f"{Fore.RED}[!] You need to write the complete URL! {Style.BRIGHT}(http/https){Style.RESET_ALL}{Fore.RESET}")
         else:
             detect = JoomlaDetector(webpage, "detect")
-            if detect:
+            if detect == True:
                 try:
                     data = JoomlaDetector(webpage, "getinfo")
 
@@ -71,7 +72,7 @@ def main():
 
             elif detect == "exc":
                 print(f"{Fore.RED}[!] Error requesting the webpage!{Fore.RESET}")
-            elif detect == "exc":
+            elif detect == "no_info":
                 print(f"{Fore.LIGHTRED_EX}[?] This webpage uses Joomla, but not info given{Fore.RESET}")
             else:
                 print(f"{Fore.RED}[!] This webpage doesn't use Joomla!{Fore.RESET}")
