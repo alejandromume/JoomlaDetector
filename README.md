@@ -1,6 +1,9 @@
 # JoomlaDetector
 Simple tool to check if a website uses Joomla! and get its information
 
+## <ins>Installation
+`pip install -r requirements.txt`
+
 ## <ins>How to use
 `python JoomlaDetector.py [website]`
 
